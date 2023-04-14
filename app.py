@@ -90,7 +90,7 @@ def handle_message(event):
         group_id = event.source.group_id
         msg = msg.split(";",3)
 #        test1 = Product(group_id,"2023-4-13","Max")
-        test1 = Product(group_id,msg[1],msg[2],msg[3])
+        test1 = Product(group_id,msg[1],msg[2],f',{msg[3]},')
         db.session.add(test1)
         db.session.commit()
         message = TextSendMessage(text="開團成功")
@@ -139,13 +139,13 @@ def handle_message(event):
              part_list = item.participater
 #        message = TextSendMessage(part_list)
         if msg[1:] not in check_item:
-            tmp_list = tmp_list +","+ msg[1:]
+            tmp_list = tmp_list + msg[1:]+","
         else: 
             uid = event.source.user_id
             gid = event.source.group_id
             profile = line_bot_api.get_group_member_profile(gid, uid)
             name = profile.display_name
-            tmp_list = tmp_list +","+name
+            tmp_list = tmp_list +name +","
         if tmp_list in part_list:
             message = TextSendMessage(text="報名過了哦")
         else:
@@ -160,6 +160,7 @@ def handle_message(event):
     elif '-' in msg[0]:
 #        message = TextSendMessage(CFG(event))#cancel from Group
         tmp_list = ''
+        del_list = ''
         check_list = ''
         check_item= ("1","")
         name = ''
@@ -169,13 +170,17 @@ def handle_message(event):
              part_list = item.participater
 #        message = TextSendMessage(part_list)
         if msg[1:] not in check_item:
-            tmp_list = tmp_list+ msg[1:]
+            tmp_list = tmp_list+","+ msg[1:]+","
+            del_list = del_list + msg[1:] + ","
+            print(del_list) 
         else: 
             uid = event.source.user_id
             gid = event.source.group_id
             profile = line_bot_api.get_group_member_profile(gid, uid)
             name = profile.display_name
-            tmp_list = tmp_list + name 
+            tmp_list = tmp_list +","+ name+","
+            del_list = del_list+  msg[1:] + ","
+            print(del_list)  
 #            if part_list.find(tmp_list) > 2:
 #                tmp_list = tmp_list+"," + name 
 #            else:
@@ -183,7 +188,7 @@ def handle_message(event):
         if tmp_list not in part_list:
             message = TextSendMessage(text="你沒有報名哦")
         else:
-            part_list = part_list.replace(tmp_list,"")
+            part_list = part_list.replace(del_list,"")
             get_today = date.today()
             values = Product.query.filter(Product.time>=get_today, Product.group_id == event.source.group_id).update({'participater':part_list})
             db.session.commit()
