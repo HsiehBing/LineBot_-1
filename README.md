@@ -73,8 +73,8 @@ participater會以字串形式儲存參加的人員
 7.人數上限設定
 8.line介面直接按+1
 ## 參考資料
-1.MySQL檢查設定狀態
-https://ithelp.ithome.com.tw/articles/10221541
-2. MySQL中文顯示不出來解決方案
+1.MySQL檢查設定狀態 \
+https://ithelp.ithome.com.tw/articles/10221541 \
+2. MySQL中文顯示不出來解決方案 \
 https://zhuanlan.zhihu.com/p/60605885
 
