@@ -1,4 +1,5 @@
-## 說明: 此機器人是根據HsiehBing/FLASK_SQL的延伸，使line群組裡面的人可以開團，報名參加活動，並串接MySQL
+## 說明: 此機器人是根據HsiehBing/FLASK_SQL的延伸，使line群組裡面的人可以開團，報名參加活動，並串接MySQL \
+以nginx、MySQL、gunicorn串接執行
 
 ## 功能說明
 
@@ -72,6 +73,8 @@ participater會以字串形式儲存參加的人員
 6.+2,-2的設定
 7.人數上限設定
 8.line介面直接按+1
+9.docker container
+
 ## 參考資料
 1.MySQL檢查設定狀態 \
 https://ithelp.ithome.com.tw/articles/10221541 \
