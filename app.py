@@ -132,7 +132,7 @@ def handle_message(event):
     elif '+' in msg[0]:
         tmp_list = ''
         check_list = ''
-        check_item= ("1","")
+        check_item= ("+","1","")
 #        message = TextSendMessage(ATG(event))#Add To Group
         values = Product.query.filter(Product.time>=datetime.today(), Product.group_id == event.source.group_id)
         for item in values:
@@ -162,7 +162,7 @@ def handle_message(event):
         tmp_list = ''
         del_list = ''
         check_list = ''
-        check_item= ("1","")
+        check_item= ("-","1","")
         name = ''
 #        message = TextSendMessage(ATG(event))#Add To Group
         values = Product.query.filter(Product.time>=datetime.today(), Product.group_id == event.source.group_id)
@@ -170,17 +170,15 @@ def handle_message(event):
              part_list = item.participater
 #        message = TextSendMessage(part_list)
         if msg[1:] not in check_item:
-            tmp_list = tmp_list+","+ msg[1:]+","
-            del_list = del_list + msg[1:] + ","
-            print(del_list) 
+            tmp_list = tmp_list+","+msg[1:]+","
+            del_list = del_list + msg[1:]+","
         else: 
             uid = event.source.user_id
             gid = event.source.group_id
             profile = line_bot_api.get_group_member_profile(gid, uid)
             name = profile.display_name
             tmp_list = tmp_list +","+ name+","
-            del_list = del_list+  msg[1:] + ","
-            print(del_list)  
+            del_list = del_list+ name +","
 #            if part_list.find(tmp_list) > 2:
 #                tmp_list = tmp_list+"," + name 
 #            else:
