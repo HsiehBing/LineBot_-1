@@ -1,4 +1,5 @@
-## 說明: 此機器人是根據HsiehBing/FLASK_SQL的延伸，使line群組裡面的人可以開團，報名參加活動，並串接MySQL \
+## 說明: 
+此機器人是根據HsiehBing/FLASK_SQL的延伸，使line群組裡面的人可以開團，報名參加活動，並串接MySQL \
 以nginx、MySQL、gunicorn串接執行
 
 ## 功能說明
