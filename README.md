@@ -26,7 +26,7 @@
   | + +1 +名字                        | ATG.py      | 報名                   |         |
   | - -1 -名字                        | CFG.py      | 取消報名               |          |
   | DeleteAllDatasFromTable          |              | 刪除該line群活動資料    |         |
-  | DeleteDatasFromTableInThisGroup  |              | 刪除所有line群活動資料  |          |
+  | DeleteDatasFromTableInThisGroup  |              | 刪除所有line群活動資料  |          |\
 
 
 ## 相關設定
@@ -34,8 +34,33 @@
 * 需要串接MySQL，並在Databases中開啟一tesbdb的資料庫
 
 
-## 設計細節說明
+### 設計細節說明
+#### 資料庫設定
+設定範例
+| pid    | group_id | time   |  description |  participater |
+| :----: | :----:   | :----: |:----:        |  :----:       |
+|1       | line抓取 |YYYY-MM-DD| 參加訊息,會分行| A,B,C,D     |\
 
+在"!開團"設定時，會以";"作為資料區隔標號，並將資料輸入進資料庫的Table中，
+pid為自動產生 \
+groupid會抓取該line群組的groupID  \
+time的輸入形式為YYYY-MM-DD在顯示時會自動加上星期幾 \
+descripation是活動細節，之後若要進一步設定人數上限時，可能會另外加一欄人數上限 \
+participater會以字串形式儲存參加的人員
+
+#### 增加參與者
+在增加參與者時，會先判斷是該用戶加入還是幫人加入，如果是該用戶，會根據lineID去查找用戶名稱，反之則直接將後方名字加入 \
+加入時會以",名字"方式加入
+
+#### 移除參與者
+在刪除參與者時，會先判斷是該用戶移除還是幫人移除，如果是該用戶，會根據lineID去查找用戶名稱，反之則直接將後方名字加入 \
+移除時會以"名字"方式移除
+
+#### 查詢
+1. 查詢時會先判斷時間日期是否大於等於現在時間，若開團時間已經過了當天就不會顯示 
+2. 會查詢該群組的groupID，並根據gorup_id提取資料
+3. 將participater以","將字串(String)分割成列表(List)，進一步將空白的列表刪除
+4. 以迴圈的形式讀取列表，並在資料前加上編號
 
 ## 待完成/未完成事項
 
@@ -45,6 +70,8 @@
 4.目前的人物增減會因為資料型態導致","影響判斷，目前先以在讀取時刪除空格處理
 5.MVC分離
 6.+2,-2的設定
+7.人數上限設定
+8.line介面直接按+1
 ## 參考資料
 1.MySQL檢查設定狀態
 https://ithelp.ithome.com.tw/articles/10221541
