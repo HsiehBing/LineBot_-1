@@ -109,6 +109,8 @@ def handle_message(event):
         for item in values:
              item.participater = item.participater.split(",")
              item.description = item.description.split(",")
+         
+             item.participater =[z for z in item.participater if z!=""]
              for x in item.participater:
                   part_list = part_list + (f"{item.participater.index(x)+1}.{x}\n")
              for y in item.description :
@@ -140,11 +142,10 @@ def handle_message(event):
             tmp_list = tmp_list +","+ msg[1:]
         else: 
             uid = event.source.user_id
-            profile = line_bot_api.get_profile(uid)
+            gid = event.source.group_id
+            profile = line_bot_api.get_group_member_profile(gid, uid)
             name = profile.display_name
             tmp_list = tmp_list +","+name
-            if tmp_list =="":
-                message = TextSendMessage(text="Error")
         if tmp_list in part_list:
             message = TextSendMessage(text="報名過了哦")
         else:
@@ -157,7 +158,39 @@ def handle_message(event):
         part_list = ''
         tmp_list = ''
     elif '-' in msg[0]:
-        message = TextSendMessage(CFG(event))#cancel from Group
+#        message = TextSendMessage(CFG(event))#cancel from Group
+        tmp_list = ''
+        check_list = ''
+        check_item= ("1","")
+        name = ''
+#        message = TextSendMessage(ATG(event))#Add To Group
+        values = Product.query.filter(Product.time>=datetime.today(), Product.group_id == event.source.group_id)
+        for item in values:
+             part_list = item.participater
+#        message = TextSendMessage(part_list)
+        if msg[1:] not in check_item:
+            tmp_list = tmp_list+ msg[1:]
+        else: 
+            uid = event.source.user_id
+            gid = event.source.group_id
+            profile = line_bot_api.get_group_member_profile(gid, uid)
+            name = profile.display_name
+            tmp_list = tmp_list + name 
+#            if part_list.find(tmp_list) > 2:
+#                tmp_list = tmp_list+"," + name 
+#            else:
+#                tmp_list =" "+ tmp_list+name+","
+        if tmp_list not in part_list:
+            message = TextSendMessage(text="你沒有報名哦")
+        else:
+            part_list = part_list.replace(tmp_list,"")
+            get_today = date.today()
+            values = Product.query.filter(Product.time>=get_today, Product.group_id == event.source.group_id).update({'participater':part_list})
+            db.session.commit()
+            message = TextSendMessage(text="取消成功")
+        line_bot_api.reply_message(event.reply_token, message)#
+        part_list = ''
+        tmp_list = ''
 #        message = TextSendMessage(text="取消成功")
         line_bot_api.reply_message(event.reply_token, message)#
 ###############        
@@ -166,14 +199,16 @@ def handle_message(event):
 #        message = TextSendMessage(text="取消成功")
         line_bot_api.reply_message(event.reply_token, message)#
     if '~' in msg[0]:
-        message = TextSendMessage(text="測試")
+        message = TextSendMessage(text=f'"!開團"可以開團中間用;分隔，範例如下：\n!開團;2023-4-13;時間1430,地點:台南高商,人數:上限27、未滿14流團;名字(可不輸入)\n\n使用"!活動"可以看開團的活動\n\n使用"+"、"+1"、"+人名"可以報名\n\n使用"-"、"-1"、"-人名"可以取消報名\n\n目前還沒處理的問題:\n1.兩個群組開同一團\n2.一個群組開兩團以上\n3.人數到達上限之後轉項目欄轉成候補')
         line_bot_api.reply_message(event.reply_token, message)#
     elif '#' in msg[0]:
         uid = event.source.user_id
-        profile = line_bot_api.get_profile(uid)
+        gid = event.source.group_id
+#        profile = line_bot_api.get_profile(uid)
+        profile = line_bot_api.get_group_member_profile(gid, uid)
         name = profile.display_name
 #        message = TextSendMessage(text=f'{name}')
-        message = TextSendMessage(text=f'{event}')
+        message = TextSendMessage(text=f'{name}')
 #        message = TextSendMessage(text=f'{event.source.group_id}')
         line_bot_api.reply_message(event.reply_token, message)#
 #    elif '!' in msg[0]:
@@ -196,7 +231,15 @@ def handle_message(event):
 #        printout = f''
 #        for item in values:
 #              printout = printout + (f'{item.pid} {item.name}{item.description}\n')
-
 #        message = TextSendMessage(printout)
 #        line_bot_api.reply_message(event.reply_token, message)#
-
+    elif "DeleteAllDatasFromTable" in msg[:23]:
+        db.drop_all()
+        message = TextSendMessage("drop the table success")
+        line_bot_api.reply_message(event.reply_token, message)#
+    elif "DeleteDatasFromTableInThisGroup" in msg[:31]:
+#        db.drop_all()
+        Product.query.filter(Product.group_id == event.source.group_id).delete()
+        db.session.commit()
+        message = TextSendMessage("clean the talbe from this group success")
+        line_bot_api.reply_message(event.reply_token, message)#
